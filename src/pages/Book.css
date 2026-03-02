@@ -493,7 +493,7 @@
 /* ============ RESPONSIVE ============ */
 @media (max-width: 768px) {
     .book-page {
-        padding: 4rem 0 3rem;
+        padding: 7rem 0 3rem;
     }
 
     .book-time-grid {
