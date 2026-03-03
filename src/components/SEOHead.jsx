@@ -4,7 +4,7 @@ import { useEffect } from 'react';
  * SEOHead — Dynamic per-page SEO metadata and JSON-LD structured data.
  * Updates document.title, meta description, canonical URL, and injects JSON-LD schemas.
  */
-const SEOHead = ({ title, description, path = '/', jsonLd = [] }) => {
+const SEOHead = ({ title, description, path = '/', jsonLd = [], image }) => {
     useEffect(() => {
         // Update title
         document.title = title;
@@ -29,6 +29,16 @@ const SEOHead = ({ title, description, path = '/', jsonLd = [] }) => {
             document.head.appendChild(ogUrl);
         }
         ogUrl.setAttribute('content', `https://adaptica.ai${path}`);
+
+        if (image) {
+            let ogImage = document.querySelector('meta[property="og:image"]');
+            if (!ogImage) {
+                ogImage = document.createElement('meta');
+                ogImage.setAttribute('property', 'og:image');
+                document.head.appendChild(ogImage);
+            }
+            ogImage.setAttribute('content', `https://adaptica.ai${image}`);
+        }
 
         // Update canonical
         let canonical = document.querySelector('link[rel="canonical"]');
@@ -61,7 +71,7 @@ const SEOHead = ({ title, description, path = '/', jsonLd = [] }) => {
                 if (el) el.remove();
             });
         };
-    }, [title, description, path, jsonLd]);
+    }, [title, description, path, jsonLd, image]);
 
     return null;
 };

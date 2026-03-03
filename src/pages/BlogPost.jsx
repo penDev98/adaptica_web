@@ -2,7 +2,7 @@ import React from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useScrollReveal } from '../hooks/useScrollReveal';
 import { blogPosts } from '../data/blogPosts';
-import { ArrowLeft, Clock, Calendar, ArrowRight } from 'lucide-react';
+import { ArrowLeft, Clock, Calendar, ArrowRight, Share2 } from 'lucide-react';
 import './Blog.css';
 import SEOHead from '../components/SEOHead';
 
@@ -28,12 +28,30 @@ const BlogPost = () => {
     // Parse content into paragraphs
     const paragraphs = post.content.trim().split('\n').filter(line => line.trim());
 
+    const handleShare = async () => {
+        try {
+            if (navigator.share) {
+                await navigator.share({
+                    title: post.title,
+                    text: post.excerpt,
+                    url: window.location.href,
+                });
+            } else {
+                await navigator.clipboard.writeText(window.location.href);
+                alert("Връзката е копирана!");
+            }
+        } catch (error) {
+            console.error('Error sharing:', error);
+        }
+    };
+
     return (
         <div ref={ref}>
             <SEOHead
                 title={`${post.title} | Adaptica AI Блог`}
                 description={post.excerpt}
                 path={`/blog/${post.slug}`}
+                image={post.image}
                 jsonLd={[{
                     "@context": "https://schema.org",
                     "@type": "Article",
@@ -59,7 +77,6 @@ const BlogPost = () => {
                     <Link to="/blog" className="blogpost-back fade-in">
                         <ArrowLeft size={16} /> Обратно към блога
                     </Link>
-                    <span className="blog-tag fade-in">{post.category}</span>
                     <h1 className="fade-in">{post.title}</h1>
                     <div className="blogpost-meta fade-in">
                         <span><Calendar size={14} /> {post.date}</span>
@@ -72,6 +89,13 @@ const BlogPost = () => {
             <section className="blogpost-content section-padding">
                 <div className="container">
                     <article className="blogpost-body fade-in">
+                        {post.image && (
+                            <img
+                                src={post.image}
+                                alt={post.title}
+                                style={{ width: '100%', borderRadius: 'var(--radius-lg)', marginBottom: '3rem', boxShadow: 'var(--card-shadow)' }}
+                            />
+                        )}
                         {paragraphs.map((para, i) => {
                             const trimmed = para.trim();
                             if (trimmed.startsWith('**') && trimmed.endsWith('**')) {
@@ -82,6 +106,12 @@ const BlogPost = () => {
                             }
                             return <p key={i}>{trimmed.replace(/\*\*/g, '')}</p>;
                         })}
+
+                        <div className="blog-share-container fade-in delay-2">
+                            <button className="blog-share-btn" onClick={handleShare}>
+                                <Share2 size={18} /> Сподели Статията
+                            </button>
+                        </div>
                     </article>
                 </div>
             </section>
